@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALLCON Arc & Ring Rolling Procurement Calculator</title>
+    <!-- SVG Favicon: Sleek Red & White Calculator -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2314181d'/><rect x='10' y='10' width='80' height='80' rx='15' fill='%231a1f26' stroke='%23e53935' stroke-width='4'/><rect x='22' y='22' width='56' height='20' rx='6' fill='%230d0f12' stroke='%2338a169' stroke-width='2'/><text x='70' y='36' font-family='monospace' font-weight='bold' font-size='14' fill='%2338a169' text-anchor='end'>8534</text><circle cx='32' cy='54' r='6' fill='%23e53935'/><circle cx='50' cy='54' r='6' fill='%23e53935'/><circle cx='68' cy='54' r='6' fill='%23e53935'/><circle cx='32' cy='72' r='6' fill='%23e53935'/><circle cx='50' cy='72' r='6' fill='%23e53935'/><circle cx='68' cy='72' r='6' fill='%2338a169'/></svg>">
+    
+    <!-- Google Fonts & Tailwind CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: {
+                            900: '#0d0f12',
+                            800: '#14181d',
+                            700: '#1a1f26',
+                            600: '#262d38',
+                            500: '#343e4f'
+                        },
+                        allcon: {
+                            red: '#e53935',
+                            redHover: '#c62828',
+                            redDark: '#8e0000',
+                            redGlow: 'rgba(229, 57, 53, 0.25)',
+                            green: '#2e7d32',
+                            greenLight: '#4caf50',
+                            greenBg: 'rgba(76, 175, 80, 0.12)',
+                            greenBorder: '#388e3c'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0d0f12;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom Glowing & Focus Styles */
+        .allcon-card {
+            background-color: #14181d;
+            border: 1px solid #262d38;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .input-editable {
+            background-color: rgba(76, 175, 80, 0.08);
+            border: 2px solid #388e3c;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .input-editable:focus {
+            outline: none;
+            border-color: #4caf50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+            background-color: rgba(76, 175, 80, 0.15);
+        }
+        .badge-recommended {
+            background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
+            border: 1px solid #52b788;
+            box-shadow: 0 0 15px rgba(82, 183, 136, 0.3);
+        }
+        .tooltip-popover {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            transform: translateY(4px);
+        }
+        .has-tooltip:hover .tooltip-popover,
+        .has-tooltip:focus-within .tooltip-popover {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-16 flex flex-col justify-between">
+
+    <!-- TOP HEADER -->
+    <header class="border-b border-obsidian-600 bg-obsidian-800 sticky top-0 z-40 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-allcon-red flex items-center justify-center text-white shadow-lg shadow-allcon-redGlow">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white flex items-center gap-2">
+                        ALLCON <span class="text-allcon-red">ARC & RING ROLLING</span> CALCULATOR
+                    </h1>
+                    <p class="text-xs text-gray-400">Digital Paperless Procurement & Material Yield System</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-300 bg-obsidian-700 px-3 py-1.5 rounded-md border border-obsidian-600">
+                <span class="w-2.5 h-2.5 rounded-full bg-allcon-greenLight animate-pulse"></span>
+                Official Shop-Floor Tool
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 flex-grow w-full space-y-8">
+
+        <!-- CALCULATION METHOD TOGGLE BAR -->
+        <section class="allcon-card rounded-xl p-5 border-l-4 border-l-allcon-red">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-base font-bold text-white uppercase tracking-wide">1. Select Calculation Method</h2>
+                        <div class="relative inline-block has-tooltip">
+                            <button class="w-5 h-5 rounded-full bg-obsidian-600 hover:bg-obsidian-500 text-gray-300 text-xs font-bold flex items-center justify-center transition" aria-label="Info">i</button>
+                            <div class="tooltip-popover absolute left-0 bottom-full mb-2 w-72 p-3 bg-obsidian-900 text-xs text-gray-200 rounded-lg shadow-2xl border border-obsidian-600 z-50 pointer-events-none">
+                                <strong class="text-allcon-red block mb-1">Procurement OD vs Workshop Neutral Axis:</strong>
+                                <strong>Procurement OD:</strong> Calculates arc using outer boundary. Adds geometric safety buffer for raw steel purchasing.<br><br>
+                                <strong>Workshop Neutral Axis:</strong> Calculates true midline of material ($\text{ID} + \text{Thickness}$). Used for exact shop-floor cutting list.
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400">Choose whether to buy material with OD safety margin or calculate net neutral axis for workshop cutting.</p>
+                </div>
+
+                <!-- TOGGLE BUTTONS -->
+                <div class="flex items-center bg-obsidian-900 p-1 rounded-lg border border-obsidian-600 self-start md:self-auto">
+                    <button id="btnMethodOD" onclick="setMethod('OD')" class="px-4 py-2 text-xs font-bold rounded-md transition-all duration-200 bg-allcon-red text-white shadow-md">
+                        Procurement OD Method (Boss's Margin) [DEFAULT]
+                    </button>
+                    <button id="btnMethodNeutral" onclick="setMethod('Neutral')" class="px-4 py-2 text-xs font-bold rounded-md transition-all duration-200 text-gray-400 hover:text-white">
+                        Workshop Net Neutral Axis Method
+                    </button>
+                </div>
+            </div>
+
+            <!-- NEUTRAL AXIS THICKNESS INPUT (Hidden by default) -->
+            <div id="neutralAxisDepthContainer" class="mt-4 pt-4 border-t border-obsidian-600 hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <label class="text-xs font-bold text-gray-300 uppercase flex items-center gap-2">
+                        Section Profile Height / Thickness ($t$) [mm]:
+                        <div class="relative inline-block has-tooltip">
+                            <button class="w-4 h-4 rounded-full bg-obsidian-600 text-gray-300 text-xs font-bold flex items-center justify-center">i</button>
+                            <div class="tooltip-popover absolute left-0 bottom-full mb-2 w-64 p-2.5 bg-obsidian-900 text-xs text-gray-200 rounded-lg border border-obsidian-600 z-50 pointer-events-none">
+                                The height or wall thickness of the profile (e.g. 8mm flat bar, 45mm square tube, 75mm angle iron). Net Neutral Pitch Dia = $\text{OD} - t$.
+                            </div>
+                        </div>
+                    </label>
+                    <input type="number" id="inputProfileThickness" value="8" step="0.1" min="0" oninput="calculateAll()" class="w-32 px-3 py-1.5 text-sm rounded-md input-editable text-center font-mono">
+                </div>
+            </div>
+        </section>
+
+        <!-- INPUT PARAMETERS GRID -->
+        <section class="space-y-3">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-allcon-greenLight"></span>
+                    2. Editable Drawing & Workshop Inputs
+                </h2>
+                <span class="text-xs text-allcon-greenLight font-semibold px-2.5 py-1 bg-allcon-greenBg border border-allcon-greenBorder rounded-full">
+                    Green Fields are Editable
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                
+                <!-- 1. Drawing OD -->
+                <div class="allcon-card p-4 rounded-xl space-y-2 relative">
+                    <div class="flex items-center justify-between">
+                        <label for="inputOD" class="text-xs font-bold text-gray-300 uppercase">Drawing OD (mm)</label>
+                        <div class="relative inline-block has-tooltip">
+                            <button class="w-4 h-4 rounded-full bg-obsidian-600 text-gray-300 text-xs font-bold flex items-center justify-center">i</button>
+                            <div class="tooltip-popover absolute right-0 bottom-full mb-2 w-64 p-2.5 bg-obsidian-900 text-xs text-gray-200 rounded-lg border border-obsidian-600 z-50 pointer-events-none">
+                                The maximum outside diameter specified on the engineering drawing (e.g. 8534mm for guard segments or 690mm for full tube rings).
+                            </div>
+                        </div>
+                    </div>
+                    <input type="number" id="inputOD" value="8534" min="1" oninput="calculateAll()" class="w-full px-3 py-2 text-lg rounded-lg input-editable text-center font-mono">
+                </div>
+
+                <!-- 2. Sweep Angle -->
+                <div class="allcon-card p-4 rounded-xl space-y-2 relative">
+                    <div class="flex items-center justify-between">
+                        <label for="inputSweep" class="text-xs font-bold text-gray-300 uppercase">Sweep Angle (°)</label>
+                        <div class="relative inline-block has-tooltip">
+                            <button class="w-4 h-4 rounded-full bg-obsidian-600 text-gray-300 text-xs font-bold flex items-center justify-center">i</button>
+                            <div class="tooltip-popover absolute right-0 bottom-full mb-2 w-64 p-2.5 bg-obsidian-900 text-xs text-gray-200 rounded-lg border border-obsidian-600 z-50 pointer-events-none">
+                                Arc sweep angle per segment (e.g. 36° for 10-segment guards, or 360° for a full continuous ring).
+                            </div>
+                        </div>
+                    </div>
+                    <input type="number" id="inputSweep" value="36" min="0.1" max="360" step="0.1" oninput="calculateAll()" class="w-full px-3 py-2 text-lg rounded-lg input-editable text-center font-mono">
+                </div>
+
+                <!-- 3. Segment Quantity -->
+                <div class="allcon-card p-4 rounded-xl space-y-2 relative">
+                    <div class="flex items-center justify-between">
+                        <label for="inputQty" class="text-xs font-bold text-gray-300 uppercase">Segment Quantity</label>
+                        <div class="relative inline-block has-tooltip">
+                            <button class="w-4 h-4 rounded-full bg-obsidian-600 text-gray-300 text-xs font-bold flex items-center justify-center">i</button>
+                            <div class="tooltip-popover absolute right-0 bottom-full mb-2 w-64 p-2.5 bg-obsidian-900 text-xs text-gray-200 rounded-lg border border-obsidian-600 z-50 pointer-events-none">
+                                Total number of identical segments required for the complete project fabrication run.
+                            </div>
+                        </div>
+                    </div>
+                    <input type="number" id="inputQty" value="20" min="1" step="1" oninput="calculateAll()" class="w-full px-3 py-2 text-lg rounded-lg input-editable text-center font-mono">
+                </div>
+
+                <!-- 4. Flat Rolling Allowance -->
+                <div class="allcon-card p-4 rounded-xl space-y-2 relative">
+                    <div class="flex items-center justify-between">
+                        <label for="inputFlatAllowance" class="text-xs font-bold text-gray-300 uppercase">Rolling Waste (mm)</label>
+                        <div class="relative inline-block has-tooltip">
+                            <button class="w-4 h-4 rounded-full bg-obsidian-600 text-gray-300 text-xs font-bold flex items-center justify-center">i</button>
+                            <div class="tooltip-popover absolute right-0 bottom-full mb-2 w-64 p-2.5 bg-obsidian-900 text-xs text-gray-200 rounded-lg border border-obsidian-600 z-50 pointer-events-none">
+                                <strong>Mandatory 600mm Allowance:</strong> 3-roll section benders cannot bend the extreme ends of a stock bar. Applied once per commercial bar.
+                            </div>
+                        </div>
+                    </div>
+                    <input type="number" id="inputFlatAllowance" value="600" min="0" step="10" oninput="calculateAll()" class="w-full px-3 py-2 text-lg rounded-lg input-editable text-center font-mono">
+                </div>
+
+                <!-- 5. Saw Kerf Allowance -->
+                <div class="allcon-card p-4 rounded-xl space-y-2 relative">
+                    <div class="flex items-center justify-between">
+                        <label for="inputKerf" class="text-xs font-bold text-gray-300 uppercase">Saw Kerf (mm)</label>
+                        <div class="relative inline-block has-tooltip">
+                            <button class="w-4 h-4 rounded-full bg-obsidian-600 text-gray-300 text-xs font-bold flex items-center justify-center">i</button>
+                            <div class="tooltip-popover absolute right-0 bottom-full mb-2 w-64 p-2.5 bg-obsidian-900 text-xs text-gray-200 rounded-lg border border-obsidian-600 z-50 pointer-events-none">
+                                Width of cold-saw blade cut thickness lost per segment cut off the rolled bar (Default: 5mm).
+                            </div>
+                        </div>
+                    </div>
+                    <input type="number" id="inputKerf" value="5" min="0" step="1" oninput="calculateAll()" class="w-full px-3 py-2 text-lg rounded-lg input-editable text-center font-mono">
+                </div>
+
+            </div>
+        </section>
+
+        <!-- CALCULATION SUMMARY METRICS -->
+        <section class="allcon-card rounded-xl p-6 bg-obsidian-800 border-t-2 border-t-obsidian-500">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4 text-allcon-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                Primary Arc Geometry Calculations
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Per Degree Length -->
+                <div class="bg-obsidian-900 p-4 rounded-lg border border-obsidian-600 flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs text-gray-400 uppercase font-semibold">Per-Degree Flat Length</span>
+                        <div class="relative inline-block has-tooltip">
+                            <button class="w-4 h-4 rounded-full bg-obsidian-700 text-gray-300 text-xs font-bold flex items-center justify-center">i</button>
+                            <div class="tooltip-popover absolute left-0 bottom-full mb-2 w-60 p-2.5 bg-obsidian-800 text-xs text-gray-200 rounded-lg border border-obsidian-600 z-50 pointer-events-none">
+                                Formula: $(\text{Diameter} \times \pi) / 360^\circ$. Exact millimeter flat length corresponding to 1 degree of sweep arc.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="resPerDegree" class="text-2xl font-bold font-mono text-white">74.473</span>
+                        <span class="text-xs text-gray-400 font-mono">mm / deg</span>
+                    </div>
+                </div>
+
+                <!-- Segment Material Length -->
+                <div class="bg-obsidian-900 p-4 rounded-lg border border-obsidian-600 flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs text-gray-400 uppercase font-semibold">Segment Material Length</span>
+                        <div class="relative inline-block has-tooltip">
+                            <button class="w-4 h-4 rounded-full bg-obsidian-700 text-gray-300 text-xs font-bold flex items-center justify-center">i</button>
+                            <div class="tooltip-popover absolute left-0 bottom-full mb-2 w-60 p-2.5 bg-obsidian-800 text-xs text-gray-200 rounded-lg border border-obsidian-600 z-50 pointer-events-none">
+                                Formula: $\text{Per-Degree Length} \times \text{Sweep Angle}$. Total flat arc length required for a single segment.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="resSegmentLength" class="text-2xl font-bold font-mono text-allcon-greenLight">2,681</span>
+                        <span class="text-xs text-gray-400 font-mono">mm / pc</span>
+                    </div>
+                </div>
+
+                <!-- Total Net Length -->
+                <div class="bg-obsidian-900 p-4 rounded-lg border border-obsidian-600 flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs text-gray-400 uppercase font-semibold">Total Net Job Length</span>
+                        <div class="relative inline-block has-tooltip">
+                            <button class="w-4 h-4 rounded-full bg-obsidian-700 text-gray-300 text-xs font-bold flex items-center justify-center">i</button>
+                            <div class="tooltip-popover absolute right-0 bottom-full mb-2 w-60 p-2.5 bg-obsidian-800 text-xs text-gray-200 rounded-lg border border-obsidian-600 z-50 pointer-events-none">
+                                Formula: $\text{Segment Length} \times \text{Quantity}$. Net total curved material before rolling waste allowances.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="resTotalNetLength" class="text-2xl font-bold font-mono text-white">53,621</span>
+                        <span class="text-xs text-gray-400 font-mono">mm</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMMERCIAL BAR OPTION CARDS (6M, 9M, 13M) -->
+        <section class="space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <svg class="w-5 h-5 text-allcon-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    3. Commercial Bar Length Procurement Options
+                </h2>
+                <span class="text-xs text-gray-400">Comparing 6M, 9M, and 13M Factory Stock Angles</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- OPTION 1: 6M BARS -->
+                <div id="card6M" class="allcon-card rounded-2xl p-6 transition-all duration-300 relative flex flex-col justify-between space-y-6">
+                    <div id="badge6MContainer" class="hidden">
+                        <div class="badge-recommended text-white text-xs font-black uppercase tracking-wider px-3 py-1.5 rounded-full inline-flex items-center gap-1.5 shadow-lg">
+                            <svg class="w-4 h-4 text-allcon-greenLight" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            BEST EFFICIENCY / RECOMMENDED BAR
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-obsidian-600">
+                            <h3 class="text-xl font-extrabold text-white">OPTION 1: 6M BARS</h3>
+                            <span class="text-xs font-mono text-gray-400">6000 mm Stock</span>
+                        </div>
+
+                        <ul class="mt-4 space-y-3 text-sm">
+                            <li class="flex items-center justify-between">
+                                <span class="text-gray-400 text-xs uppercase flex items-center gap-1">
+                                    Usable Rolling Length
+                                    <div class="relative inline-block has-tooltip">
+                                        <button class="w-3.5 h-3.5 rounded-full bg-obsidian-700 text-gray-300 text-xs flex items-center justify-center">i</button>
+                                        <div class="tooltip-popover absolute left-0 bottom-full mb-1 w-48 p-2 bg-obsidian-900 text-xs text-gray-200 rounded border border-obsidian-600 z-50 pointer-events-none">
+                                            $6000\text{mm} - 600\text{mm flat waste} = 5400\text{mm}$.
+                                        </div>
+                                    </div>
+                                </span>
+                                <span id="usable6M" class="font-mono font-bold text-white">5,400 mm</span>
+                            </li>
+
+                            <li class="flex items-center justify-between">
+                                <span class="text-gray-400 text-xs uppercase flex items-center gap-1">
+                                    Segments per Bar
+                                    <div class="relative inline-block has-tooltip">
+                                        <button class="w-3.5 h-3.5 rounded-full bg-obsidian-700 text-gray-300 text-xs flex items-center justify-center">i</button>
+                                        <div class="tooltip-popover absolute left-0 bottom-full mb-1 w-48 p-2 bg-obsidian-900 text-xs text-gray-200 rounded border border-obsidian-600 z-50 pointer-events-none">
+                                            How many full arc segments fit into one usable rolled length (including saw kerf).
+                                        </div>
+                                    </div>
+                                </span>
+                                <span id="segPerBar6M" class="font-mono font-bold text-allcon-greenLight text-base">2 pcs</span>
+                            </li>
+
+                            <li class="flex items-center justify-between pt-2 border-t border-obsidian-700">
+                                <span class="text-gray-200 font-bold text-xs uppercase">Total Bars to Order</span>
+                                <span id="barsToOrder6M" class="font-mono font-extrabold text-allcon-red text-xl">10 Bars</span>
+                            </li>
+
+                            <li class="flex items-center justify-between">
+                                <span class="text-gray-400 text-xs uppercase">Total Project Offcut</span>
+                                <span id="totalOffcut6M" class="font-mono font-bold text-white">379 mm</span>
+                            </li>
+
+                            <li class="flex items-center justify-between">
+                                <span class="text-gray-400 text-xs uppercase">Projected Offcut per Bar</span>
+                                <span id="barOffcut6M" class="font-mono font-bold text-gray-300">38 mm / bar</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- OPTION 2: 9M BARS -->
+                <div id="card9M" class="allcon-card rounded-2xl p-6 transition-all duration-300 relative flex flex-col justify-between space-y-6">
+                    <div id="badge9MContainer" class="hidden">
+                        <div class="badge-recommended text-white text-xs font-black uppercase tracking-wider px-3 py-1.5 rounded-full inline-flex items-center gap-1.5 shadow-lg">
+                            <svg class="w-4 h-4 text-allcon-greenLight" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            BEST EFFICIENCY / RECOMMENDED BAR
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-obsidian-600">
+                            <h3 class="text-xl font-extrabold text-white">OPTION 2: 9M BARS</h3>
+                            <span class="text-xs font-mono text-gray-400">9000 mm Stock</span>
+                        </div>
+
+                        <ul class="mt-4 space-y-3 text-sm">
+                            <li class="flex items-center justify-between">
+                                <span class="text-gray-400 text-xs uppercase flex items-center gap-1">
+                                    Usable Rolling Length
+                                    <div class="relative inline-block has-tooltip">
+                                        <button class="w-3.5 h-3.5 rounded-full bg-obsidian-700 text-gray-300 text-xs flex items-center justify-center">i</button>
+                                        <div class="tooltip-popover absolute left-0 bottom-full mb-1 w-48 p-2 bg-obsidian-900 text-xs text-gray-200 rounded border border-obsidian-600 z-50 pointer-events-none">
+                                            $9000\text{mm} - 600\text{mm flat waste} = 8400\text{mm}$.
+                                        </div>
+                                    </div>
+                                </span>
+                                <span id="usable9M" class="font-mono font-bold text-white">8,400 mm</span>
+                            </li>
+
+                            <li class="flex items-center justify-between">
+                                <span class="text-gray-400 text-xs uppercase flex items-center gap-1">
+                                    Segments per Bar
+                                    <div class="relative inline-block has-tooltip">
+                                        <button class="w-3.5 h-3.5 rounded-full bg-obsidian-700 text-gray-300 text-xs flex items-center justify-center">i</button>
+                                        <div class="tooltip-popover absolute left-0 bottom-full mb-1 w-48 p-2 bg-obsidian-900 text-xs text-gray-200 rounded border border-obsidian-600 z-50 pointer-events-none">
+                                            How many full arc segments fit into one usable rolled length.
+                                        </div>
+                                    </div>
+                                </span>
+                                <span id="segPerBar9M" class="font-mono font-bold text-allcon-greenLight text-base">3 pcs</span>
+                            </li>
+
+                            <li class="flex items-center justify-between pt-2 border-t border-obsidian-700">
+                                <span class="text-gray-200 font-bold text-xs uppercase">Total Bars to Order</span>
+                                <span id="barsToOrder9M" class="font-mono font-extrabold text-allcon-red text-xl">7 Bars</span>
+                            </li>
+
+                            <li class="flex items-center justify-between">
+                                <span class="text-gray-400 text-xs uppercase">Total Project Offcut</span>
+                                <span id="totalOffcut9M" class="font-mono font-bold text-white">5,179 mm</span>
+                            </li>
+
+                            <li class="flex items-center justify-between">
+                                <span class="text-gray-400 text-xs uppercase">Projected Offcut per Bar</span>
+                                <span id="barOffcut9M" class="font-mono font-bold text-gray-300">740 mm / bar</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- OPTION 3: 13M BARS -->
+                <div id="card13M" class="allcon-card rounded-2xl p-6 transition-all duration-300 relative flex flex-col justify-between space-y-6">
+                    <div id="badge13MContainer" class="hidden">
+                        <div class="badge-recommended text-white text-xs font-black uppercase tracking-wider px-3 py-1.5 rounded-full inline-flex items-center gap-1.5 shadow-lg">
+                            <svg class="w-4 h-4 text-allcon-greenLight" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            BEST EFFICIENCY / RECOMMENDED BAR
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-obsidian-600">
+                            <h3 class="text-xl font-extrabold text-white">OPTION 3: 13M BARS</h3>
+                            <span class="text-xs font-mono text-gray-400">13000 mm Stock</span>
+                        </div>
+
+                        <ul class="mt-4 space-y-3 text-sm">
+                            <li class="flex items-center justify-between">
+                                <span class="text-gray-400 text-xs uppercase flex items-center gap-1">
+                                    Usable Rolling Length
+                                    <div class="relative inline-block has-tooltip">
+                                        <button class="w-3.5 h-3.5 rounded-full bg-obsidian-700 text-gray-300 text-xs flex items-center justify-center">i</button>
+                                        <div class="tooltip-popover absolute left-0 bottom-full mb-1 w-48 p-2 bg-obsidian-900 text-xs text-gray-200 rounded border border-obsidian-600 z-50 pointer-events-none">
+                                            $13000\text{mm} - 600\text{mm flat waste} = 12400\text{mm}$.
+                                        </div>
+                                    </div>
+                                </span>
+                                <span id="usable13M" class="font-mono font-bold text-white">12,400 mm</span>
+                            </li>
+
+                            <li class="flex items-center justify-between">
+                                <span class="text-gray-400 text-xs uppercase flex items-center gap-1">
+                                    Segments per Bar
+                                    <div class="relative inline-block has-tooltip">
+                                        <button class="w-3.5 h-3.5 rounded-full bg-obsidian-700 text-gray-300 text-xs flex items-center justify-center">i</button>
+                                        <div class="tooltip-popover absolute left-0 bottom-full mb-1 w-48 p-2 bg-obsidian-900 text-xs text-gray-200 rounded border border-obsidian-600 z-50 pointer-events-none">
+                                            How many full arc segments fit into one usable rolled length.
+                                        </div>
+                                    </div>
+                                </span>
+                                <span id="segPerBar13M" class="font-mono font-bold text-allcon-greenLight text-base">4 pcs</span>
+                            </li>
+
+                            <li class="flex items-center justify-between pt-2 border-t border-obsidian-700">
+                                <span class="text-gray-200 font-bold text-xs uppercase">Total Bars to Order</span>
+                                <span id="barsToOrder13M" class="font-mono font-extrabold text-allcon-red text-xl">5 Bars</span>
+                            </li>
+
+                            <li class="flex items-center justify-between">
+                                <span class="text-gray-400 text-xs uppercase">Total Project Offcut</span>
+                                <span id="totalOffcut13M" class="font-mono font-bold text-white">8,379 mm</span>
+                            </li>
+
+                            <li class="flex items-center justify-between">
+                                <span class="text-gray-400 text-xs uppercase">Projected Offcut per Bar</span>
+                                <span id="barOffcut13M" class="font-mono font-bold text-gray-300">1,676 mm / bar</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- HELP & USER GUIDE SECTION -->
+        <footer class="allcon-card rounded-2xl p-6 bg-obsidian-800 border-t border-obsidian-600 space-y-4">
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <svg class="w-5 h-5 text-allcon-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Understanding Rolling Physics & Calculation Rules
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-gray-300">
+                <div class="space-y-1">
+                    <strong class="text-allcon-greenLight block">1. Mandatory 600mm Flat Allowance:</strong>
+                    Commercial 3-roll section benders require leverage at the start and end of a bar. This leaves roughly $300\text{mm}$ unbent flat metal on both ends ($600\text{mm}$ total per bar). Rolling full factory lengths eliminates paying this waste allowance on individual segments!
+                </div>
+
+                <div class="space-y-1">
+                    <strong class="text-allcon-red block">2. Procurement OD vs Workshop Cut:</strong>
+                    Calculating flat length on the Outer Diameter ($\text{OD}$) builds in a safe geometric buffer so buyers never under-order steel. When cutting rolled arcs on the shop floor, the neutral axis ($(\text{OD}-t) \times \pi / 360$) ensures parts roll to exact radius without binding.
+                </div>
+
+                <div class="space-y-1">
+                    <strong class="text-gray-100 block">3. Saw Blade Kerf Deduction:</strong>
+                    Cold-sawing or angle-grinder slitting consumes $3\text{mm}$ to $5\text{mm}$ of steel width per cut. The calculator accounts for kerf loss when slitting multiple segments out of a single rolled bar.
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- FOOTER COPYRIGHT -->
+    <div class="text-center text-xs text-gray-500 mt-8">
+        ALLCON Steel Fabrication & Procurement Systems &bull; Single-Page Offline App
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // State Variable for Calculation Method
+        let currentMethod = 'OD'; // 'OD' or 'Neutral'
+
+        function setMethod(method) {
+            currentMethod = method;
+            const btnOD = document.getElementById('btnMethodOD');
+            const btnNeutral = document.getElementById('btnMethodNeutral');
+            const thicknessContainer = document.getElementById('neutralAxisDepthContainer');
+
+            if (method === 'OD') {
+                btnOD.className = "px-4 py-2 text-xs font-bold rounded-md transition-all duration-200 bg-allcon-red text-white shadow-md";
+                btnNeutral.className = "px-4 py-2 text-xs font-bold rounded-md transition-all duration-200 text-gray-400 hover:text-white";
+                thicknessContainer.classList.add('hidden');
+            } else {
+                btnNeutral.className = "px-4 py-2 text-xs font-bold rounded-md transition-all duration-200 bg-allcon-red text-white shadow-md";
+                btnOD.className = "px-4 py-2 text-xs font-bold rounded-md transition-all duration-200 text-gray-400 hover:text-white";
+                thicknessContainer.classList.remove('hidden');
+            }
+
+            calculateAll();
+        }
+
+        function calculateAll() {
+            // Read Raw Inputs
+            const od = parseFloat(document.getElementById('inputOD').value) || 0;
+            const sweep = parseFloat(document.getElementById('inputSweep').value) || 0;
+            const qty = parseInt(document.getElementById('inputQty').value) || 0;
+            const flatAllowance = parseFloat(document.getElementById('inputFlatAllowance').value) || 0;
+            const kerf = parseFloat(document.getElementById('inputKerf').value) || 0;
+            const thickness = parseFloat(document.getElementById('inputProfileThickness').value) || 0;
+
+            if (od <= 0 || sweep <= 0 || qty <= 0) {
+                return;
+            }
+
+            // Determine Effective Diameter for Calculation
+            let effectiveDia = od;
+            if (currentMethod === 'Neutral') {
+                effectiveDia = od - thickness;
+            }
+
+            // 1. Primary Geometry Formulas
+            const perDegree = (effectiveDia * Math.PI) / 360;
+            const segmentLength = perDegree * sweep;
+            const totalNetLength = segmentLength * qty;
+
+            // Display Summary Results
+            document.getElementById('resPerDegree').textContent = perDegree.toFixed(3);
+            document.getElementById('resSegmentLength').textContent = Math.round(segmentLength).toLocaleString();
+            document.getElementById('resTotalNetLength').textContent = Math.round(totalNetLength).toLocaleString();
+
+            // 2. Calculate Yields for Stock Bars (6000mm, 9000mm, 13000mm)
+            const stockLengths = [
+                { id: '6M', length: 6000 },
+                { id: '9M', length: 9000 },
+                { id: '13M', length: 13000 }
+            ];
+
+            let lowestTotalOffcut = Infinity;
+            let bestOptionId = null;
+
+            const results = {};
+
+            stockLengths.forEach(stock => {
+                const usableLength = stock.length - flatAllowance;
+                
+                // Formula: INT( (Usable + Kerf) / (Segment + Kerf) )
+                let segPerBar = Math.floor((usableLength + kerf) / (segmentLength + kerf));
+                if (segPerBar < 1) segPerBar = 1;
+
+                const barsToOrder = Math.ceil(qty / segPerBar);
+                const sawCuts = (qty - 1); // Cuts between segments
+
+                // Offcut Formula
+                const totalOffcut = (barsToOrder * stock.length) - (qty * segmentLength + barsToOrder * flatAllowance + sawCuts * kerf);
+                const offcutPerBar = barsToOrder > 0 ? (totalOffcut / barsToOrder) : 0;
+
+                results[stock.id] = {
+                    usableLength,
+                    segPerBar,
+                    barsToOrder,
+                    totalOffcut: Math.max(0, totalOffcut),
+                    offcutPerBar: Math.max(0, offcutPerBar)
+                };
+
+                // Track Best Efficiency (Lowest Total Offcut)
+                if (results[stock.id].totalOffcut < lowestTotalOffcut) {
+                    lowestTotalOffcut = results[stock.id].totalOffcut;
+                    bestOptionId = stock.id;
+                }
+            });
+
+            // 3. Render Bar Cards & Update UI
+            stockLengths.forEach(stock => {
+                const id = stock.id;
+                const data = results[id];
+
+                document.getElementById(`usable${id}`).textContent = `${Math.round(data.usableLength).toLocaleString()} mm`;
+                document.getElementById(`segPerBar${id}`).textContent = `${data.segPerBar} pcs`;
+                document.getElementById(`barsToOrder${id}`).textContent = `${data.barsToOrder} Bars`;
+                document.getElementById(`totalOffcut${id}`).textContent = `${Math.round(data.totalOffcut).toLocaleString()} mm`;
+                document.getElementById(`barOffcut${id}`).textContent = `${Math.round(data.offcutPerBar).toLocaleString()} mm / bar`;
+
+                // Badge & Card Highlighting Logic
+                const cardEl = document.getElementById(`card${id}`);
+                const badgeEl = document.getElementById(`badge${id}Container`);
+
+                if (id === bestOptionId) {
+                    badgeEl.classList.remove('hidden');
+                    cardEl.classList.add('border-allcon-greenBorder', 'shadow-2xl', 'scale-[1.02]');
+                    cardEl.classList.remove('border-obsidian-600');
+                } else {
+                    badgeEl.classList.add('hidden');
+                    cardEl.classList.remove('border-allcon-greenBorder', 'shadow-2xl', 'scale-[1.02]');
+                    cardEl.classList.add('border-obsidian-600');
+                }
+            });
+        }
+
+        // Initialize Calculation on Load
+        window.onload = function() {
+            calculateAll();
+        };
+    </script>
+</body>
+</html>
