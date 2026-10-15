@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ALLCON Arc & Ring Rolling Procurement Calculator</title>
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2314181d'/><rect x='15' y='15' width='70' height='25' rx='5' fill='%23388e3c'/><rect x='15' y='50' width='20' height='15' rx='3' fill='%23e53935'/><rect x='40' y='50' width='20' height='15' rx='3' fill='%232a313d'/><rect x='65' y='50' width='20' height='15' rx='3' fill='%232a313d'/><rect x='15' y='72' width='20' height='15' rx='3' fill='%232a313d'/><rect x='40' y='72' width='20' height='15' rx='3' fill='%232a313d'/><rect x='65' y='72' width='20' height='15' rx='3' fill='%23e53935'/></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2314181d'/><rect x='15' y='15' width='70' height='25' rx='5' fill='%23e53935'/><rect x='15' y='50' width='20' height='15' rx='3' fill='%23e53935'/><rect x='40' y='50' width='20' height='15' rx='3' fill='%232a313d'/><rect x='65' y='50' width='20' height='15' rx='3' fill='%232a313d'/></svg>">
     <style>
         :root {
             --bg-obsidian: #0d0f12;
             --card-bg: #14181d;
             --card-border: #232931;
             --allcon-red: #e53935;
-            --allcon-red-hover: #f44336;
             --editable-green-border: #388e3c;
             --editable-green-bg: #1b2e1e;
             --editable-green-glow: rgba(56, 142, 60, 0.4);
@@ -56,14 +55,14 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            max-width: 380px;
+            max-width: 420px;
         }
 
-        .logo-img {
+        .svg-logo {
             width: 100%;
             height: auto;
             display: block;
-            border-radius: 4px;
+            border-radius: 2px;
         }
 
         .subtitle-under-logo {
@@ -72,11 +71,9 @@
             text-transform: uppercase;
             letter-spacing: 1.5px;
             color: #ffffff;
-            background-color: var(--allcon-red);
-            text-align: center;
-            padding: 6px 0;
-            margin-top: 4px;
-            border-radius: 2px;
+            background: transparent;
+            text-align: left;
+            padding: 8px 0 0 2px;
             width: 100%;
         }
 
@@ -373,8 +370,20 @@
 <div class="calculator-container">
     <header>
         <div class="logo-title-group">
-            <img class="logo-img" src="ALLCON-Logo.jpg" alt="ALLCON Fabrication & Engineering">
-            <div class="subtitle-under-logo">Arc & Ring Calculator</div>
+            <!-- Inline SVG Logo -->
+            <svg class="svg-logo" viewBox="0 0 600 125" xmlns="http://www.w3.org/2000/svg">
+                <!-- Red Box -->
+                <rect width="600" height="100" fill="#E53935"/>
+                <!-- ALLCON Text -->
+                <text x="300" y="78" font-family="'Arial Black', 'Impact', sans-serif" font-weight="900" font-size="88" fill="#FFFFFF" text-anchor="middle" letter-spacing="4">ALLCON</text>
+                <!-- White Bottom Line -->
+                <rect y="102" width="600" height="6" fill="#FFFFFF"/>
+                <!-- Black Bottom Stripe -->
+                <rect y="110" width="600" height="15" fill="#000000"/>
+                <!-- Subtitle Text -->
+                <text x="300" y="122" font-family="'Arial', sans-serif" font-weight="bold" font-size="11" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">FABRICATION &amp; ENGINEERING (PTY) LTD.</text>
+            </svg>
+            <div class="subtitle-under-logo">ARC &amp; RING CALCULATOR</div>
         </div>
         <div class="badge-editable-info">Green Fields are Editable</div>
     </header>
@@ -394,7 +403,7 @@
     <!-- Section Profile Input (Only visible in Neutral mode) -->
     <div id="sectionDepthBlock" class="input-card editable" style="display: none; margin-bottom: 24px;">
         <div class="input-label">
-            Section Profile Height / Thickness ($t$) [mm]
+            Section Profile Height / Thickness (t) [mm]
             <button class="info-btn">i
                 <span class="tooltip-box">Height/thickness of angle iron or tube section. Used to calculate neutral axis pitch diameter (OD - t).</span>
             </button>
@@ -403,7 +412,7 @@
     </div>
 
     <div class="section-header">
-        <span>2. EDITABLE DRAWING & WORKSHOP INPUTS</span>
+        <span>2. EDITABLE DRAWING &amp; WORKSHOP INPUTS</span>
     </div>
 
     <!-- Inputs -->
@@ -642,7 +651,7 @@
             calcDia = rawOD - depth;
         }
 
-        // 1. Primary Geometry Calculations
+        // Primary Geometry Calculations
         const perDegree = (calcDia * Math.PI) / 360;
         const segMaterialLength = perDegree * sweep;
         const totalNetJobLength = segMaterialLength * qty;
@@ -651,7 +660,7 @@
         document.getElementById('valSegmentLength').innerHTML = Math.round(segMaterialLength).toLocaleString() + ' <span style="font-size:12px; color:var(--text-muted);">mm / pc</span>';
         document.getElementById('valTotalNetLength').innerHTML = Math.round(totalNetJobLength).toLocaleString() + ' <span style="font-size:12px; color:var(--text-muted);">mm</span>';
 
-        // 2. Commercial Bar Calculations
+        // Commercial Bar Calculations
         const options = [
             { id: '6m', stock: 6000, card: document.getElementById('card6m') },
             { id: '9m', stock: 9000, card: document.getElementById('card9m') },
