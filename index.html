@@ -55,26 +55,29 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            max-width: 420px;
+            max-width: 280px;
         }
 
-        .svg-logo {
+        .header-logo-img {
             width: 100%;
+            max-width: 280px;
             height: auto;
             display: block;
-            border-radius: 2px;
+            border-radius: 4px;
         }
 
         .subtitle-under-logo {
-            font-size: 18px;
-            font-weight: 800;
+            font-size: 13px;
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 4px;
             color: #ffffff;
             background: transparent;
-            text-align: left;
-            padding: 8px 0 0 2px;
+            text-align: justify;
+            text-align-last: justify;
+            padding: 8px 0 0 0;
             width: 100%;
+            line-height: 1.2;
         }
 
         .badge-editable-info {
@@ -370,20 +373,8 @@
 <div class="calculator-container">
     <header>
         <div class="logo-title-group">
-            <!-- Inline SVG Logo -->
-            <svg class="svg-logo" viewBox="0 0 600 125" xmlns="http://www.w3.org/2000/svg">
-                <!-- Red Box -->
-                <rect width="600" height="100" fill="#E53935"/>
-                <!-- ALLCON Text -->
-                <text x="300" y="78" font-family="'Arial Black', 'Impact', sans-serif" font-weight="900" font-size="88" fill="#FFFFFF" text-anchor="middle" letter-spacing="4">ALLCON</text>
-                <!-- White Bottom Line -->
-                <rect y="102" width="600" height="6" fill="#FFFFFF"/>
-                <!-- Black Bottom Stripe -->
-                <rect y="110" width="600" height="15" fill="#000000"/>
-                <!-- Subtitle Text -->
-                <text x="300" y="122" font-family="'Arial', sans-serif" font-weight="bold" font-size="11" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">FABRICATION &amp; ENGINEERING (PTY) LTD.</text>
-            </svg>
-            <div class="subtitle-under-logo">ARC &amp; RING CALCULATOR</div>
+            <img src="ALLCON-Logo.jpg" alt="ALLCON Fabrication & Engineering" class="header-logo-img">
+            <div class="subtitle-under-logo">Arc &amp; Ring Calculator</div>
         </div>
         <div class="badge-editable-info">Green Fields are Editable</div>
     </header>
@@ -403,7 +394,7 @@
     <!-- Section Profile Input (Only visible in Neutral mode) -->
     <div id="sectionDepthBlock" class="input-card editable" style="display: none; margin-bottom: 24px;">
         <div class="input-label">
-            Section Profile Height / Thickness (t) [mm]
+            Section Profile Height / Thickness (mm)
             <button class="info-btn">i
                 <span class="tooltip-box">Height/thickness of angle iron or tube section. Used to calculate neutral axis pitch diameter (OD - t).</span>
             </button>
@@ -449,7 +440,7 @@
 
         <div class="input-card editable">
             <div class="input-label">
-                Rolling Waste (mm)
+                Rolling Waste Allowance (mm)
                 <button class="info-btn">i
                     <span class="tooltip-box">Flat unbent end allowance per commercial bar required by 3-roll section benders (typically 600mm).</span>
                 </button>
